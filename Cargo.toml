@@ -2,5 +2,7 @@
 name = "bengali-phonetic-parser"
 version = "0.1.0"
 authors = ["Muhammad Mominul Huque <mominul2082@gmail.com>"]
+license = "MPL-2.0"
 
 [dependencies]
+json = "0.11.8"
