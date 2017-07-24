@@ -43,6 +43,10 @@ impl<'a> PhoneticParser<'a> {
     fn is_case_sensitive(&self, character: char) -> bool {
         self.case_sensitive.contains(&character.to_lowercase().to_string())
     }
+
+    fn is_number(&self, character: char) -> bool {
+        self.numbers.contains(character)
+    }
 }
 
 #[cfg(test)]
@@ -76,5 +80,6 @@ mod tests {
         assert!(parser.is_consonant('B'));
         assert_eq!(parser.is_consonant('e'), false);
         assert_eq!(parser.fix_string("ODEr AMAr".to_string()), "ODer amar");
+        assert!(parser.is_number('1'));
     }
 }
