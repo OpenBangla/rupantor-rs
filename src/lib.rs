@@ -12,7 +12,7 @@ pub struct PhoneticParser<'a> {
 }
 
 impl<'a> PhoneticParser<'a> {
-    fn new(rule: &json::JsonValue) -> PhoneticParser {
+    pub fn new(rule: &json::JsonValue) -> PhoneticParser {
         PhoneticParser {
             patterns: rule,
             vowel: rule["vowel"].as_str().unwrap().to_string(),
@@ -22,7 +22,7 @@ impl<'a> PhoneticParser<'a> {
         }
     }
 
-    fn convert(&self, input: String) -> String {
+    pub fn convert(&self, input: String) -> String {
         let fixed = self.fix_string(input);
         let mut output = String::new();
 
