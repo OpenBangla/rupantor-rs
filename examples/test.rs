@@ -18,4 +18,7 @@ fn main() {
 
     let cvt = PhoneticParser::new(&js);
     println!("{}", cvt.convert("ami".to_owned()));
+/*
+    let _find = &js["patterns"];
+    println!("{}", _find.len());*/
 }

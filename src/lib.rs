@@ -1,4 +1,6 @@
 #![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_assignments)]
 extern crate json;
 
 use std::cmp::Ordering;
@@ -14,7 +16,7 @@ pub struct PhoneticParser<'a> {
 impl<'a> PhoneticParser<'a> {
     pub fn new(rule: &json::JsonValue) -> PhoneticParser {
         PhoneticParser {
-            patterns: rule,
+            patterns: &rule["patterns"],
             vowel: rule["vowel"].as_str().unwrap().to_string(),
             consonant: rule["consonant"].as_str().unwrap().to_string(),
             numbers: rule["number"].as_str().unwrap().to_string(),
@@ -26,30 +28,31 @@ impl<'a> PhoneticParser<'a> {
         let fixed = self.fix_string(input);
         let mut output = String::new();
 
-        let _find = &self.patterns[0]["find"];
+        let _find = &self.patterns[0]["find"].to_string();
         let max_pattern_len = _find.len();
 
 
         let len = fixed.len();
 
         for mut cur in 0..len {
-            let start = cur;
-            let mut end = 0;
+            let start = cur as i32;
+            let mut end: i32 = 0;
             let mut matched = false;
 
             for chunk_len in (1..max_pattern_len+1).rev() {
-                end = start + chunk_len;
-                if end <= len {
-                    let chunk = &fixed[start..chunk_len+1];
+                end = start + chunk_len as i32;
+                if end <= len as i32 {
+                    let chunk = fixed.substring(start as usize, chunk_len as usize);
+                    //println!("{}", chunk);
                     
                     // Binary Search
-                    let mut left = 0; 
-                    let mut right = self.patterns.len() - 1;
-                    let mut mid = 0;
+                    let mut left: i32 = 0; 
+                    let mut right = self.patterns.len() as i32 - 1;
+                    let mut mid: i32 = 0;
                     while right >= left {
                         mid = (right + left) / 2;
-                        let pattern = &self.patterns[mid];
-                        let find = &pattern["find"];
+                        let pattern = &self.patterns[mid as usize];
+                        let find = pattern["find"].as_str().unwrap();
                         if find == chunk {
                             let rules = &pattern["rules"];
                             if !rules.is_empty() {
@@ -58,8 +61,8 @@ impl<'a> PhoneticParser<'a> {
                                     let mut chk = 0;
                                     let matches = &rule["matches"];
                                     for _match in matches.members() {
-                                        let value = _match["value"].as_str().unwrap();
-                                        let _type = &_match["type"];
+                                        let value = _match["value"].as_str().unwrap_or("");
+                                        let _type = _match["type"].as_str().unwrap();
                                         let mut scope = _match["scope"].as_str().unwrap();
                                         let mut is_negative = false;
 
@@ -80,8 +83,8 @@ impl<'a> PhoneticParser<'a> {
                                             if
                                               ! (
                                               (chk < 0 && (_type == "prefix")) ||
-                                              (chk >= len && (_type == "suffix")) ||
-                                               self.is_punctuation(&fixed[chk..chk+1])
+                                              (chk >= len as i32 && (_type == "suffix")) ||
+                                               self.is_punctuation(&fixed[chk as usize..(chk+1) as usize])
                                               ) ^ is_negative
                                             {
                                                 replace = false;
@@ -92,9 +95,9 @@ impl<'a> PhoneticParser<'a> {
                                               !(
                                                (
                                                (chk >= 0 && (_type == "prefix")) ||
-                                               (chk < len && (_type == "suffix"))
+                                               (chk < len as i32 && (_type == "suffix"))
                                                ) &&
-                                               self.is_vowel(&fixed[chk..chk+1])
+                                               self.is_vowel(&fixed[chk as usize..(chk+1) as usize])
                                                ) ^ is_negative
                                             {
                                                 replace = false;
@@ -105,26 +108,26 @@ impl<'a> PhoneticParser<'a> {
                                               !(
                                                (
                                                (chk >= 0 && (_type == "prefix")) ||
-                                               (chk < len && (_type == "suffix"))
+                                               (chk < len as i32 && (_type == "suffix"))
                                                ) &&
-                                               self.is_number(&fixed[chk..chk+1])
+                                               self.is_number(&fixed[chk as usize..(chk+1) as usize])
                                                ) ^ is_negative
                                             {
                                                 replace = false;
                                                 break;
                                             }
                                         } else if scope == "exact" {
-                                            let mut s = 0;
-                                            let mut e = 0;
+                                            let mut s: i32 = 0;
+                                            let mut e: i32 = 0;
                                             if _type == "suffix" {
                                                 s = end;
-                                                e = end + value.len();
+                                                e = end + value.len() as i32;
                                             } else {
                                                 // Prefix
-                                                s = start - value.len();
+                                                s = start - value.len() as i32;
                                                 e = start;
                                             }
-                                            if !self.is_exact(value, &fixed, s as u32, e as u32, is_negative) {
+                                            if !self.is_exact(value, &fixed, s, e, is_negative) {
                                                 replace = false;
                                                 break;
                                             }
@@ -134,7 +137,7 @@ impl<'a> PhoneticParser<'a> {
                                     if replace {
                                         let rl = rule["replace"].as_str().unwrap();
                                         output += rl;
-                                        cur = end - 1;
+                                        cur = (end - 1) as usize;
                                         matched = true;
                                         break;
                                     }
@@ -146,14 +149,14 @@ impl<'a> PhoneticParser<'a> {
                             // Default
                             let rl = pattern["replace"].as_str().unwrap();
                             output += rl;
-                            cur = end - 1;
+                            cur = (end - 1) as usize;
                             matched = true;
                             break;
                         } else if find.len() > chunk.len() ||
-                                  (find.len() == chunk.len() && find.as_str().unwrap().to_string().cmp(&chunk.to_string()) == Ordering::Less) {
+                                  (find.len() == chunk.len() && find.to_string().cmp(&chunk.to_string()) == Ordering::Less) {
                             left = mid + 1;
                         } else {
-                            right = mid - 1;
+                            right = mid - 1; //prob
                         }
                     }
                     if matched { break; }
@@ -196,14 +199,30 @@ impl<'a> PhoneticParser<'a> {
         self.numbers.contains(character)
     }
 
-    fn is_exact(&self, needle: &str, heystack: &str, start: u32, end: u32, not: bool) -> bool {
+    fn is_exact(&self, needle: &str, heystack: &str, start: i32, end: i32, not: bool) -> bool {
         let len = end - start;
         //return ((start >= 0 && end < heystack.length() && (heystack.mid(start, len) == needle)) ^ strnot);
-        ((start >= 0 && end < heystack.len() as u32 && (&heystack[(start as usize)..(len as usize + 1)] == needle)) ^ not)
+        ((start >= 0 && end < heystack.len() as i32 && (heystack.substring(start as usize, end as usize) == needle)) ^ not)
     }
 
     fn is_punctuation(&self, character: &str) -> bool {
         !(self.is_vowel(character) || self.is_consonant(character))
+    }
+}
+
+trait Substring {
+    fn substring(&self, start: usize, length: usize) -> &str;
+}
+
+impl Substring for std::string::String {
+    fn substring(&self, start: usize, length: usize) -> &str {
+        &self[start..(start+length)]
+    }
+}
+
+impl Substring for str {
+    fn substring(&self, start: usize, length: usize) -> &str {
+        &self[start..(start+length)]
     }
 }
 
