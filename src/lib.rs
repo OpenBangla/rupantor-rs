@@ -172,15 +172,13 @@ impl<'a> PhoneticParser<'a> {
     }
     
     fn fix_string(&self, string: String) -> String {
-        let mut fixed = String::new();
-        for character in string.chars() {
+        string.chars().map(|character| {
             if self.is_case_sensitive(character) {
-                fixed.push(character);
+                character
             } else {
-                fixed.push_str(&character.to_lowercase().to_string());
+                character.to_lowercase().next().unwrap()
             }
-        }
-        fixed
+        }).collect()
     }
 
     fn is_vowel(&self, string: &str) -> bool {
