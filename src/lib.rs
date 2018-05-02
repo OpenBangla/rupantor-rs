@@ -43,7 +43,6 @@ impl<'a> PhoneticParser<'a> {
                 end = start + chunk_len as i32;
                 if end <= len as i32 {
                     let chunk = fixed.substring(start as usize, chunk_len as usize);
-                    //println!("{}", chunk);
                     
                     // Binary Search
                     let mut left: i32 = 0; 
@@ -53,6 +52,7 @@ impl<'a> PhoneticParser<'a> {
                         mid = (right + left) / 2;
                         let pattern = &self.patterns[mid as usize];
                         let find = pattern["find"].as_str().unwrap();
+                        //println!("chunk {} find {}", chunk, find);
                         if find == chunk {
                             let rules = &pattern["rules"];
                             if !rules.is_empty() {
@@ -84,7 +84,7 @@ impl<'a> PhoneticParser<'a> {
                                               ! (
                                               (chk < 0 && (_type == "prefix")) ||
                                               (chk >= len as i32 && (_type == "suffix")) ||
-                                               self.is_punctuation(&fixed[chk as usize..(chk+1) as usize])
+                                               self.is_punctuation(fixed.at(chk as usize))
                                               ) ^ is_negative
                                             {
                                                 replace = false;
@@ -97,8 +97,21 @@ impl<'a> PhoneticParser<'a> {
                                                (chk >= 0 && (_type == "prefix")) ||
                                                (chk < len as i32 && (_type == "suffix"))
                                                ) &&
-                                               self.is_vowel(&fixed[chk as usize..(chk+1) as usize])
+                                               self.is_vowel(fixed.at(chk as usize))
                                                ) ^ is_negative
+                                            {
+                                                replace = false;
+                                                break;
+                                            }
+                                        } else if scope == "consonant" {
+                                            if
+                                                !(
+                                                (
+                                                (chk >= 0 && (_type == "prefix")) ||
+                                                (chk < len as i32 && (_type == "suffix"))
+                                                ) &&
+                                                self.is_consonant(fixed.at(chk as usize))
+                                                ) ^ is_negative
                                             {
                                                 replace = false;
                                                 break;
@@ -110,7 +123,7 @@ impl<'a> PhoneticParser<'a> {
                                                (chk >= 0 && (_type == "prefix")) ||
                                                (chk < len as i32 && (_type == "suffix"))
                                                ) &&
-                                               self.is_number(&fixed[chk as usize..(chk+1) as usize])
+                                               self.is_number(fixed.at(chk as usize))
                                                ) ^ is_negative
                                             {
                                                 replace = false;
@@ -156,7 +169,7 @@ impl<'a> PhoneticParser<'a> {
                                   (find.len() == chunk.len() && find.to_string().cmp(&chunk.to_string()) == Ordering::Less) {
                             left = mid + 1;
                         } else {
-                            right = mid - 1; //prob
+                            right = mid - 1;
                         }
                     }
                     if matched { break; }
@@ -200,7 +213,9 @@ impl<'a> PhoneticParser<'a> {
     fn is_exact(&self, needle: &str, heystack: &str, start: i32, end: i32, not: bool) -> bool {
         let len = end - start;
         //return ((start >= 0 && end < heystack.length() && (heystack.mid(start, len) == needle)) ^ strnot);
-        ((start >= 0 && end < heystack.len() as i32 && (heystack.substring(start as usize, end as usize) == needle)) ^ not)
+        let b = (start >= 0 && end < heystack.len() as i32 && (heystack.substring(start as usize, len as usize) == needle)) != not;
+        println!("needle {} heystack {} start {} end {} not {} exact {}", needle, heystack, start, end, not, b);
+        b
     }
 
     fn is_punctuation(&self, character: &str) -> bool {
@@ -210,17 +225,26 @@ impl<'a> PhoneticParser<'a> {
 
 trait Substring {
     fn substring(&self, start: usize, length: usize) -> &str;
+    fn at(&self, pos: usize) -> &str;
 }
 
 impl Substring for std::string::String {
     fn substring(&self, start: usize, length: usize) -> &str {
         &self[start..(start+length)]
     }
+
+    fn at(&self, pos: usize) -> &str {
+        &self[pos..pos+1]
+    }
 }
 
 impl Substring for str {
     fn substring(&self, start: usize, length: usize) -> &str {
         &self[start..(start+length)]
+    }
+
+    fn at(&self, pos: usize) -> &str {
+        &self[pos..pos+1]
     }
 }
 
