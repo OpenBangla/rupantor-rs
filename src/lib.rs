@@ -166,7 +166,7 @@ impl<'a> PhoneticParser<'a> {
                             matched = true;
                             break;
                         } else if find.len() > chunk.len() ||
-                                  (find.len() == chunk.len() && find.to_string().cmp(&chunk.to_string()) == Ordering::Less) {
+                                  (find.len() == chunk.len() && find.cmp(&chunk) == Ordering::Less) {
                             left = mid + 1;
                         } else {
                             right = mid - 1;
