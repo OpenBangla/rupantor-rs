@@ -20,7 +20,7 @@ impl<'a> PhoneticParser<'a> {
             vowel: rule["vowel"].as_str().unwrap().to_string(),
             consonant: rule["consonant"].as_str().unwrap().to_string(),
             numbers: rule["number"].as_str().unwrap().to_string(),
-            case_sensitive: rule["casesensitive"].as_str().unwrap().to_string()
+            case_sensitive: rule["casesensitive"].as_str().unwrap().to_string(),
         }
     }
 
@@ -31,7 +31,6 @@ impl<'a> PhoneticParser<'a> {
         let _find = self.patterns[0]["find"].as_str().unwrap();
         let max_pattern_len = _find.len();
 
-
         let len = fixed.len();
         let mut cur = 0;
         while cur < len {
@@ -39,13 +38,13 @@ impl<'a> PhoneticParser<'a> {
             let mut end: i32 = 0;
             let mut matched = false;
 
-            for chunk_len in (1..max_pattern_len+1).rev() {
+            for chunk_len in (1..max_pattern_len + 1).rev() {
                 end = start + chunk_len as i32;
                 if end <= len as i32 {
                     let chunk = fixed.substring(start as usize, chunk_len as usize);
-                    
+
                     // Binary Search
-                    let mut left: i32 = 0; 
+                    let mut left: i32 = 0;
                     let mut right = self.patterns.len() as i32 - 1;
                     let mut mid: i32 = 0;
                     while right >= left {
@@ -77,56 +76,63 @@ impl<'a> PhoneticParser<'a> {
                                         } else {
                                             chk = start - 1;
                                         }
-                                        
+
                                         // Beginning
-                                        if scope == "punctuation" {
-                                            if ((chk < 0 && (_type == "prefix")) ||
-                                                (chk >= len as i32 && (_type == "suffix")) ||
-                                                self.is_punctuation(fixed.at(chk as usize))) == is_negative
+                                        match scope {
+                                            "punctuation" => if ((chk < 0 && (_type == "prefix"))
+                                                || (chk >= len as i32 && (_type == "suffix"))
+                                                || self.is_punctuation(fixed.at(chk as usize)))
+                                                == is_negative
                                             {
                                                 replace = false;
                                                 break;
-                                            }
-                                        } else if scope == "vowel" {
-                                            if (((chk >= 0 && (_type == "prefix")) ||
-                                                (chk < len as i32 && (_type == "suffix"))) &&
-                                                self.is_vowel(fixed.at(chk as usize))) == is_negative
+                                            },
+                                            "vowel" => if (((chk >= 0 && (_type == "prefix"))
+                                                || (chk < len as i32 && (_type == "suffix")))
+                                                && self.is_vowel(fixed.at(chk as usize)))
+                                                == is_negative
                                             {
                                                 replace = false;
                                                 break;
-                                            }
-                                        } else if scope == "consonant" {
-                                            if (((chk >= 0 && (_type == "prefix")) ||
-                                                (chk < len as i32 && (_type == "suffix"))) &&
-                                                self.is_consonant(fixed.at(chk as usize))) == is_negative
+                                            },
+
+                                            "consonant" => if (((chk >= 0 && (_type == "prefix"))
+                                                || (chk < len as i32 && (_type == "suffix")))
+                                                && self.is_consonant(fixed.at(chk as usize)))
+                                                == is_negative
                                             {
                                                 replace = false;
                                                 break;
-                                            }
-                                        } else if scope == "number" {
-                                            if (((chk >= 0 && (_type == "prefix")) ||
-                                                (chk < len as i32 && (_type == "suffix"))) &&
-                                                self.is_number(fixed.at(chk as usize))) == is_negative
+                                            },
+
+                                            "number" => if (((chk >= 0 && (_type == "prefix"))
+                                                || (chk < len as i32 && (_type == "suffix")))
+                                                && self.is_number(fixed.at(chk as usize)))
+                                                == is_negative
                                             {
                                                 replace = false;
                                                 break;
+                                            },
+
+                                            "exact" => {
+                                                let mut s: i32 = 0;
+                                                let mut e: i32 = 0;
+                                                if _type == "suffix" {
+                                                    s = end;
+                                                    e = end + value.len() as i32;
+                                                } else {
+                                                    // Prefix
+                                                    s = start - value.len() as i32;
+                                                    e = start;
+                                                }
+                                                if !self.is_exact(value, &fixed, s, e, is_negative)
+                                                {
+                                                    replace = false;
+                                                    break;
+                                                }
                                             }
-                                        } else if scope == "exact" {
-                                            let mut s: i32 = 0;
-                                            let mut e: i32 = 0;
-                                            if _type == "suffix" {
-                                                s = end;
-                                                e = end + value.len() as i32;
-                                            } else {
-                                                // Prefix
-                                                s = start - value.len() as i32;
-                                                e = start;
-                                            }
-                                            if !self.is_exact(value, &fixed, s, e, is_negative) {
-                                                replace = false;
-                                                break;
-                                            }
-                                        }
+                                            _ => panic!("Unknown scope"),
+                                        };
                                     }
 
                                     if replace {
@@ -138,41 +144,49 @@ impl<'a> PhoneticParser<'a> {
                                 }
                             }
 
-                            if matched { break; }
+                            if matched {
+                                break;
+                            }
 
                             // Default
                             output += pattern["replace"].as_str().unwrap();
                             cur = (end - 1) as usize;
                             matched = true;
                             break;
-                        } else if find.len() > chunk.len() ||
-                                  (find.len() == chunk.len() && find.cmp(&chunk) == Ordering::Less) {
+                        } else if find.len() > chunk.len()
+                            || (find.len() == chunk.len() && find.cmp(&chunk) == Ordering::Less)
+                        {
                             left = mid + 1;
                         } else {
                             right = mid - 1;
                         }
                     }
-                    if matched { break; }
+                    if matched {
+                        break;
+                    }
                 }
             }
 
             if !matched {
-                output += &fixed[cur..cur+1];
+                output += &fixed[cur..cur + 1];
             }
             cur += 1;
         }
 
         output
     }
-    
+
     fn fix_string(&self, string: String) -> String {
-        string.chars().map(|character| {
-            if self.is_case_sensitive(character) {
-                character
-            } else {
-                character.to_lowercase().next().unwrap()
-            }
-        }).collect()
+        string
+            .chars()
+            .map(|character| {
+                if self.is_case_sensitive(character) {
+                    character
+                } else {
+                    character.to_lowercase().next().unwrap()
+                }
+            })
+            .collect()
     }
 
     fn is_vowel(&self, string: &str) -> bool {
@@ -184,7 +198,8 @@ impl<'a> PhoneticParser<'a> {
     }
 
     fn is_case_sensitive(&self, character: char) -> bool {
-        self.case_sensitive.contains(&character.to_lowercase().to_string())
+        self.case_sensitive
+            .contains(&character.to_lowercase().to_string())
     }
 
     fn is_number(&self, character: &str) -> bool {
@@ -193,7 +208,8 @@ impl<'a> PhoneticParser<'a> {
 
     fn is_exact(&self, needle: &str, heystack: &str, start: i32, end: i32, not: bool) -> bool {
         let len = end - start;
-        (start >= 0 && end < heystack.len() as i32 && (heystack.substring(start as usize, len as usize) == needle)) != not
+        (start >= 0 && end < heystack.len() as i32
+            && (heystack.substring(start as usize, len as usize) == needle)) != not
     }
 
     fn is_punctuation(&self, character: &str) -> bool {
@@ -208,21 +224,21 @@ trait Substring {
 
 impl Substring for std::string::String {
     fn substring(&self, start: usize, length: usize) -> &str {
-        &self[start..(start+length)]
+        &self[start..(start + length)]
     }
 
     fn at(&self, pos: usize) -> &str {
-        &self[pos..pos+1]
+        &self[pos..pos + 1]
     }
 }
 
 impl Substring for str {
     fn substring(&self, start: usize, length: usize) -> &str {
-        &self[start..(start+length)]
+        &self[start..(start + length)]
     }
 
     fn at(&self, pos: usize) -> &str {
-        &self[pos..pos+1]
+        &self[pos..pos + 1]
     }
 }
 
@@ -239,14 +255,14 @@ mod tests {
         let mut p = env::current_dir().unwrap();
         p.push("AvroPhonetic.json");
         let path = p.to_str().unwrap();
-        
+
         let mut grammer = String::new();
 
         let _ = File::open(path).unwrap().read_to_string(&mut grammer);
 
         json::parse(&grammer).unwrap()
     }
-    
+
     #[test]
     fn test_helpers() {
         let json = get_rule();
