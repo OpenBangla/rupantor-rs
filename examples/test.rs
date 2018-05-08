@@ -17,7 +17,7 @@ fn main() {
     let js = json::parse(&grammer).unwrap();
 
     let cvt = PhoneticParser::new(&js);
-    println!("{}", cvt.convert("ami".to_owned()));
+    println!("{}", cvt.convert("ami banglay gan gai".to_owned()));
 /*
     let _find = &js["patterns"];
     println!("{}", _find.len());*/

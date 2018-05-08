@@ -33,8 +33,8 @@ impl<'a> PhoneticParser<'a> {
 
 
         let len = fixed.len();
-
-        for mut cur in 0..len {
+        let mut cur = 0;
+        while cur < len {
             let start = cur as i32;
             let mut end: i32 = 0;
             let mut matched = false;
@@ -179,6 +179,7 @@ impl<'a> PhoneticParser<'a> {
             if !matched {
                 output += &fixed[cur..cur+1];
             }
+            cur += 1;
         }
 
         output
@@ -212,10 +213,7 @@ impl<'a> PhoneticParser<'a> {
 
     fn is_exact(&self, needle: &str, heystack: &str, start: i32, end: i32, not: bool) -> bool {
         let len = end - start;
-        //return ((start >= 0 && end < heystack.length() && (heystack.mid(start, len) == needle)) ^ strnot);
-        let b = (start >= 0 && end < heystack.len() as i32 && (heystack.substring(start as usize, len as usize) == needle)) != not;
-        println!("needle {} heystack {} start {} end {} not {} exact {}", needle, heystack, start, end, not, b);
-        b
+        (start >= 0 && end < heystack.len() as i32 && (heystack.substring(start as usize, len as usize) == needle)) != not
     }
 
     fn is_punctuation(&self, character: &str) -> bool {
