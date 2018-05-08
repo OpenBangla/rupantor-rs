@@ -28,7 +28,7 @@ impl<'a> PhoneticParser<'a> {
         let fixed = self.fix_string(input);
         let mut output = String::new();
 
-        let _find = &self.patterns[0]["find"].to_string();
+        let _find = self.patterns[0]["find"].as_str().unwrap();
         let max_pattern_len = _find.len();
 
 
@@ -80,51 +80,33 @@ impl<'a> PhoneticParser<'a> {
                                         
                                         // Beginning
                                         if scope == "punctuation" {
-                                            if
-                                              ! (
-                                              (chk < 0 && (_type == "prefix")) ||
-                                              (chk >= len as i32 && (_type == "suffix")) ||
-                                               self.is_punctuation(fixed.at(chk as usize))
-                                              ) ^ is_negative
+                                            if ((chk < 0 && (_type == "prefix")) ||
+                                                (chk >= len as i32 && (_type == "suffix")) ||
+                                                self.is_punctuation(fixed.at(chk as usize))) == is_negative
                                             {
                                                 replace = false;
                                                 break;
                                             }
                                         } else if scope == "vowel" {
-                                            if
-                                              !(
-                                               (
-                                               (chk >= 0 && (_type == "prefix")) ||
-                                               (chk < len as i32 && (_type == "suffix"))
-                                               ) &&
-                                               self.is_vowel(fixed.at(chk as usize))
-                                               ) ^ is_negative
+                                            if (((chk >= 0 && (_type == "prefix")) ||
+                                                (chk < len as i32 && (_type == "suffix"))) &&
+                                                self.is_vowel(fixed.at(chk as usize))) == is_negative
                                             {
                                                 replace = false;
                                                 break;
                                             }
                                         } else if scope == "consonant" {
-                                            if
-                                                !(
-                                                (
-                                                (chk >= 0 && (_type == "prefix")) ||
-                                                (chk < len as i32 && (_type == "suffix"))
-                                                ) &&
-                                                self.is_consonant(fixed.at(chk as usize))
-                                                ) ^ is_negative
+                                            if (((chk >= 0 && (_type == "prefix")) ||
+                                                (chk < len as i32 && (_type == "suffix"))) &&
+                                                self.is_consonant(fixed.at(chk as usize))) == is_negative
                                             {
                                                 replace = false;
                                                 break;
                                             }
                                         } else if scope == "number" {
-                                            if
-                                              !(
-                                               (
-                                               (chk >= 0 && (_type == "prefix")) ||
-                                               (chk < len as i32 && (_type == "suffix"))
-                                               ) &&
-                                               self.is_number(fixed.at(chk as usize))
-                                               ) ^ is_negative
+                                            if (((chk >= 0 && (_type == "prefix")) ||
+                                                (chk < len as i32 && (_type == "suffix"))) &&
+                                                self.is_number(fixed.at(chk as usize))) == is_negative
                                             {
                                                 replace = false;
                                                 break;
@@ -148,8 +130,7 @@ impl<'a> PhoneticParser<'a> {
                                     }
 
                                     if replace {
-                                        let rl = rule["replace"].as_str().unwrap();
-                                        output += rl;
+                                        output += rule["replace"].as_str().unwrap();
                                         cur = (end - 1) as usize;
                                         matched = true;
                                         break;
@@ -160,8 +141,7 @@ impl<'a> PhoneticParser<'a> {
                             if matched { break; }
 
                             // Default
-                            let rl = pattern["replace"].as_str().unwrap();
-                            output += rl;
+                            output += pattern["replace"].as_str().unwrap();
                             cur = (end - 1) as usize;
                             matched = true;
                             break;
