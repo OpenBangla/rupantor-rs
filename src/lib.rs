@@ -38,7 +38,7 @@ impl<'a> PhoneticParser<'a> {
             let mut end: i32 = 0;
             let mut matched = false;
 
-            for chunk_len in (1..max_pattern_len + 1).rev() {
+            for chunk_len in (1..=max_pattern_len).rev() {
                 end = start + chunk_len as i32;
                 if end <= len as i32 {
                     let chunk = fixed.substring(start as usize, chunk_len as usize);
@@ -51,7 +51,6 @@ impl<'a> PhoneticParser<'a> {
                         mid = (right + left) / 2;
                         let pattern = &self.patterns[mid as usize];
                         let find = pattern["find"].as_str().unwrap();
-                        //println!("chunk {} find {}", chunk, find);
                         if find == chunk {
                             let rules = &pattern["rules"];
                             if !rules.is_empty() {
