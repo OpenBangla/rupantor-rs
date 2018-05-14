@@ -243,28 +243,12 @@ impl Substring for str {
 
 #[cfg(test)]
 mod tests {
-    use std::env;
-    use std::fs::File;
-    use std::io::Read;
     use json;
     use super::PhoneticParser;
 
-    fn get_rule() -> json::JsonValue {
-        // Get the rule file
-        let mut p = env::current_dir().unwrap();
-        p.push("AvroPhonetic.json");
-        let path = p.to_str().unwrap();
-
-        let mut grammer = String::new();
-
-        let _ = File::open(path).unwrap().read_to_string(&mut grammer);
-
-        json::parse(&grammer).unwrap()
-    }
-
     #[test]
     fn test_helpers() {
-        let json = get_rule();
+        let json = json::parse(include_str!("AvroPhonetic.json")).unwrap();
         let parser = PhoneticParser::new(&json);
 
         assert!(parser.is_vowel("A"));
