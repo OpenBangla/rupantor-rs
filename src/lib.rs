@@ -70,7 +70,7 @@ impl<'a> PhoneticParser<'a> {
                                             scope = &scope[1..];
                                         }
 
-                                        if _find == "suffix" {
+                                        if _type == "suffix" {
                                             chk = end;
                                         } else {
                                             chk = start - 1;
