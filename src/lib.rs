@@ -11,6 +11,7 @@ pub struct PhoneticParser<'a> {
     consonant: String,
     numbers: String,
     case_sensitive: String,
+    max_pattern_len: usize,
 }
 
 impl<'a> PhoneticParser<'a> {
@@ -21,15 +22,13 @@ impl<'a> PhoneticParser<'a> {
             consonant: rule["consonant"].as_str().unwrap().to_string(),
             numbers: rule["number"].as_str().unwrap().to_string(),
             case_sensitive: rule["casesensitive"].as_str().unwrap().to_string(),
+            max_pattern_len: rule["patterns"][0]["find"].as_str().unwrap().len(),
         }
     }
 
     pub fn convert(&self, input: String) -> String {
         let fixed = self.fix_string(input);
         let mut output = String::new();
-
-        let _find = self.patterns[0]["find"].as_str().unwrap();
-        let max_pattern_len = _find.len();
 
         let len = fixed.len();
         let mut cur = 0;
@@ -38,7 +37,7 @@ impl<'a> PhoneticParser<'a> {
             let mut end: i32 = 0;
             let mut matched = false;
 
-            for chunk_len in (1..=max_pattern_len).rev() {
+            for chunk_len in (1..=self.max_pattern_len).rev() {
                 end = start + chunk_len as i32;
                 if end <= len as i32 {
                     let chunk = fixed.substring(start as usize, chunk_len as usize);
