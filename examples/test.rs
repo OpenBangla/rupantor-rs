@@ -1,6 +1,6 @@
 extern crate bengali_phonetic_parser;
 extern crate json;
-use bengali_phonetic_parser::PhoneticParser;
+use bengali_phonetic_parser::parser::PhoneticParser;
 
 fn main() {
     // Parse the rule file
