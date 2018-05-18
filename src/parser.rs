@@ -179,7 +179,7 @@ impl PhoneticParser {
                 if self.is_case_sensitive(character) {
                     character
                 } else {
-                    character.to_lowercase().next().unwrap()
+                    character.to_ascii_lowercase()
                 }
             })
             .collect()
