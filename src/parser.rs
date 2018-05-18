@@ -186,16 +186,16 @@ impl PhoneticParser {
     }
 
     fn is_vowel(&self, string: &str) -> bool {
-        self.vowel.contains(&string.to_lowercase())
+        self.vowel.contains(&string.to_ascii_lowercase())
     }
 
     fn is_consonant(&self, string: &str) -> bool {
-        self.consonant.contains(&string.to_lowercase())
+        self.consonant.contains(&string.to_ascii_lowercase())
     }
 
     fn is_case_sensitive(&self, character: char) -> bool {
         self.case_sensitive
-            .contains(&character.to_lowercase().to_string())
+            .contains(character.to_ascii_lowercase())
     }
 
     fn is_number(&self, character: &str) -> bool {
