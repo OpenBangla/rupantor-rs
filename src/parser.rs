@@ -3,8 +3,8 @@ use json;
 use std;
 use std::cmp::Ordering;
 
-pub struct PhoneticParser<'a> {
-    patterns: &'a json::JsonValue,
+pub struct PhoneticParser {
+    patterns: json::JsonValue,
     vowel: String,
     consonant: String,
     numbers: String,
@@ -12,10 +12,10 @@ pub struct PhoneticParser<'a> {
     max_pattern_len: usize,
 }
 
-impl<'a> PhoneticParser<'a> {
+impl PhoneticParser {
     pub fn new(rule: &json::JsonValue) -> PhoneticParser {
         PhoneticParser {
-            patterns: &rule["patterns"],
+            patterns: rule["patterns"].clone(),
             vowel: rule["vowel"].as_str().unwrap().to_string(),
             consonant: rule["consonant"].as_str().unwrap().to_string(),
             numbers: rule["number"].as_str().unwrap().to_string(),
