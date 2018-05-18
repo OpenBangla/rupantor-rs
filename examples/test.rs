@@ -7,5 +7,5 @@ fn main() {
     let js = json::parse(include_str!("../src/AvroPhonetic.json")).unwrap();
 
     let cvt = PhoneticParser::new(&js);
-    println!("{}", cvt.convert("ami banglay gan gai".to_owned()));
+    println!("{}", cvt.convert("ami banglay gan gai"));
 }
