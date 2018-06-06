@@ -3,6 +3,8 @@ use json;
 use std;
 use std::cmp::Ordering;
 
+/// Parses and converts text into Bengali according to
+/// given grammar.
 pub struct PhoneticParser {
     patterns: json::JsonValue,
     vowel: String,
@@ -13,6 +15,9 @@ pub struct PhoneticParser {
 }
 
 impl PhoneticParser {
+    /// Creates a new `PhoneticParser` instance from the given Json
+    /// value. The Json value must need to be a Json Object containing
+    /// the required values, otherwise a panic would occur.
     pub fn new(rule: &json::JsonValue) -> PhoneticParser {
         PhoneticParser {
             patterns: rule["patterns"].clone(),
@@ -24,6 +29,7 @@ impl PhoneticParser {
         }
     }
 
+    /// Converts the given input string into Bengali according to the grammar.
     pub fn convert(&self, input: &str) -> String {
         let fixed = self.fix_string(input);
         let mut output = String::new();

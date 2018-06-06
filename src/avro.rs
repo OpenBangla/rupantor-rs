@@ -1,16 +1,27 @@
 use json;
 use parser::PhoneticParser;
 
+/// Converts text into Bengali by using Avro Phonetic
+/// transliteration method.
 pub struct AvroPhonetic {
     parser: PhoneticParser,
 }
 
 impl AvroPhonetic {
+    /// Creates a new AvroPhonetic instance.
     pub fn new() -> AvroPhonetic {
         let rule = json::parse(include_str!("AvroPhonetic.json")).unwrap();
         AvroPhonetic { parser: PhoneticParser::new(&rule) }
     }
 
+    /// Converts the input text into Bengali by using Avro Phonetic method.
+    /// 
+    /// # Example
+    /// ```rust
+    /// # extern crate rupantor;
+    /// # use rupantor::avro::AvroPhonetic;
+    /// assert_eq!(AvroPhonetic::new().convert("rasT"), "রাস্ট");
+    /// ```
     pub fn convert(&self, input: &str) -> String {
         self.parser.convert(input)
     }
