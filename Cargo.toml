@@ -1,8 +1,13 @@
 [package]
 name = "rupantor"
 version = "0.1.0"
+description = "A Bengali Phonetic Parser which is very flexible and supports Avro Phonetic"
 authors = ["Muhammad Mominul Huque <mominul2082@gmail.com>"]
+categories = ["text-processing"]
+keywords = ["avro-phonetic", "bangla", "bengali", "avro"]
 license = "MPL-2.0"
+readme = "README.md"
+repository = "https://github.com/OpenBangla/rupantor-rs"
 
 [dependencies]
 json = "0.11.8"
