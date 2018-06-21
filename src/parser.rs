@@ -1,8 +1,7 @@
 #![allow(unused_assignments)]
-extern crate stringplus;
 use json;
 use std::cmp::Ordering;
-use self::stringplus::StringPlus;
+use stringplus::StringPlus;
 
 /// Parses and converts text into Bengali according to given grammar.
 pub struct PhoneticParser {

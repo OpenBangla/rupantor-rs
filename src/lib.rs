@@ -28,6 +28,7 @@
 //! and [ObjectiveC](https://github.com/torifat/iAvro/blob/master/AvroParser.m).
 //! This crate is the Rust port of that phonetic conversion algorithm.
 extern crate json;
+extern crate stringplus;
 
 pub mod parser;
 pub mod avro;
