@@ -1,10 +1,10 @@
 #![allow(unused_assignments)]
+extern crate stringplus;
 use json;
-use std;
 use std::cmp::Ordering;
+use self::stringplus::StringPlus;
 
-/// Parses and converts text into Bengali according to
-/// given grammar.
+/// Parses and converts text into Bengali according to given grammar.
 pub struct PhoneticParser {
     patterns: json::JsonValue,
     vowel: String,
@@ -216,31 +216,6 @@ impl PhoneticParser {
 
     fn is_punctuation(&self, character: &str) -> bool {
         !(self.is_vowel(character) || self.is_consonant(character))
-    }
-}
-
-trait Substring {
-    fn substring(&self, start: usize, length: usize) -> &str;
-    fn at(&self, pos: usize) -> &str;
-}
-
-impl Substring for std::string::String {
-    fn substring(&self, start: usize, length: usize) -> &str {
-        &self[start..(start + length)]
-    }
-
-    fn at(&self, pos: usize) -> &str {
-        &self[pos..pos + 1]
-    }
-}
-
-impl Substring for str {
-    fn substring(&self, start: usize, length: usize) -> &str {
-        &self[start..(start + length)]
-    }
-
-    fn at(&self, pos: usize) -> &str {
-        &self[pos..pos + 1]
     }
 }
 
