@@ -27,7 +27,7 @@
 //! [Rifat Nabi](https://github.com/torifat) in [JavaScript](https://github.com/torifat/jsAvroPhonetic)
 //! and [ObjectiveC](https://github.com/torifat/iAvro/blob/master/AvroParser.m).
 //! This crate is the Rust port of that phonetic conversion algorithm.
-extern crate json;
+extern crate serde_json;
 extern crate stringplus;
 
 pub mod parser;

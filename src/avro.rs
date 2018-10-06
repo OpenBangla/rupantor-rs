@@ -1,4 +1,4 @@
-use json;
+use serde_json;
 use parser::PhoneticParser;
 
 /// Converts text into Bengali by using Avro Phonetic
@@ -10,7 +10,7 @@ pub struct AvroPhonetic {
 impl AvroPhonetic {
     /// Creates a new AvroPhonetic instance.
     pub fn new() -> AvroPhonetic {
-        let rule = json::parse(include_str!("AvroPhonetic.json")).unwrap();
+        let rule = serde_json::from_str(include_str!("AvroPhonetic.json")).unwrap();
         AvroPhonetic { parser: PhoneticParser::new(&rule) }
     }
 
