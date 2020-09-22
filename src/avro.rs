@@ -1,5 +1,5 @@
 use serde_json;
-use parser::PhoneticParser;
+use crate::parser::PhoneticParser;
 
 /// Converts text into Bengali by using Avro Phonetic
 /// transliteration method.
@@ -18,7 +18,6 @@ impl AvroPhonetic {
     /// 
     /// # Example
     /// ```rust
-    /// # extern crate rupantor;
     /// # use rupantor::avro::AvroPhonetic;
     /// assert_eq!(AvroPhonetic::new().convert("rasT"), "রাস্ট");
     /// ```
@@ -29,7 +28,7 @@ impl AvroPhonetic {
 
 #[cfg(test)]
 mod tests {
-    use avro::AvroPhonetic;
+    use super::AvroPhonetic;
 
     #[test]
     fn test_avro() {

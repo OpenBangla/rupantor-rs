@@ -1,5 +1,3 @@
-extern crate rupantor;
-extern crate serde_json;
 use rupantor::parser::PhoneticParser;
 
 fn main() {

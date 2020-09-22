@@ -221,7 +221,7 @@ impl PhoneticParser {
 #[cfg(test)]
 mod tests {
     use serde_json;
-    use parser::PhoneticParser;
+    use super::PhoneticParser;
 
     #[test]
     fn test_helpers() {
