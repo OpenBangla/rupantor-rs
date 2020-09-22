@@ -1,6 +1,6 @@
 [package]
 name = "rupantor"
-version = "0.2.0"
+version = "0.3.0"
 description = "A Bengali Phonetic Parser which is very flexible and supports Avro Phonetic"
 authors = ["Muhammad Mominul Huque <mominul2082@gmail.com>"]
 categories = ["text-processing"]

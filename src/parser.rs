@@ -31,9 +31,9 @@ impl PhoneticParser {
     /// Converts the given input string into Bengali according to the grammar.
     pub fn convert(&self, input: &str) -> String {
         let fixed = self.fix_string(input);
-        let mut output = String::new();
-
         let len = fixed.len();
+        let mut output = String::with_capacity(len * 3);
+
         let mut cur = 0;
         while cur < len {
             let start = cur as i32;
@@ -61,7 +61,7 @@ impl PhoneticParser {
                                     let mut chk = 0;
                                     let matches = rule["matches"].as_array().unwrap();
                                     for _match in matches {
-                                        let value = _match["value"].as_str().unwrap_or("");
+                                        let value = _match["value"].as_str().unwrap_or_default();
                                         let _type = _match["type"].as_str().unwrap();
                                         let mut scope = _match["scope"].as_str().unwrap();
                                         let mut is_negative = false;
