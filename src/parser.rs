@@ -1,10 +1,11 @@
 #![allow(unused_assignments)]
 use std::cmp::Ordering;
+use serde_json::Value;
 use stringplus::StringPlus;
 
 /// Parses and converts text into Bengali according to given grammar.
 pub struct PhoneticParser {
-    patterns: json::JsonValue,
+    patterns: Vec<Value>,
     vowel: String,
     consonant: String,
     numbers: String,
@@ -16,9 +17,9 @@ impl PhoneticParser {
     /// Creates a new `PhoneticParser` instance from the given Json
     /// value. The Json value must need to be a Json Object containing
     /// the required values, otherwise a panic would occur.
-    pub fn new(rule: &json::JsonValue) -> PhoneticParser {
+    pub fn new(rule: &Value) -> PhoneticParser {
         PhoneticParser {
-            patterns: rule["patterns"].clone(),
+            patterns: rule["patterns"].as_array().unwrap().clone(),
             vowel: rule["vowel"].as_str().unwrap().to_string(),
             consonant: rule["consonant"].as_str().unwrap().to_string(),
             numbers: rule["number"].as_str().unwrap().to_string(),
@@ -53,14 +54,14 @@ impl PhoneticParser {
                         let pattern = &self.patterns[mid as usize];
                         let find = pattern["find"].as_str().unwrap();
                         if find == chunk {
-                            let rules = &pattern["rules"];
+                            let rules = pattern["rules"].as_array().unwrap();
                             if !rules.is_empty() {
-                                for rule in rules.members() {
+                                for rule in rules {
                                     let mut replace = true;
                                     let mut chk = 0;
-                                    let matches = &rule["matches"];
-                                    for _match in matches.members() {
-                                        let value = _match["value"].as_str().unwrap_or_default();
+                                    let matches = rule["matches"].as_array().unwrap();
+                                    for _match in matches {
+                                        let value = _match["value"].as_str().unwrap_or("");
                                         let _type = _match["type"].as_str().unwrap();
                                         let mut scope = _match["scope"].as_str().unwrap();
                                         let mut is_negative = false;
@@ -219,11 +220,12 @@ impl PhoneticParser {
 
 #[cfg(test)]
 mod tests {
-    use super::PhoneticParser;
+    use serde_json;
+    use parser::PhoneticParser;
 
     #[test]
     fn test_helpers() {
-        let json = json::parse(include_str!("AvroPhonetic.json")).unwrap();
+        let json = serde_json::from_str(include_str!("AvroPhonetic.json")).unwrap();
         let parser = PhoneticParser::new(&json);
 
         assert!(parser.is_vowel("A"));
@@ -236,7 +238,7 @@ mod tests {
 
     #[test]
     fn test_basic() {
-        let json = json::parse(include_str!("AvroPhonetic.json")).unwrap();
+        let json = serde_json::from_str(include_str!("AvroPhonetic.json")).unwrap();
         let parser = PhoneticParser::new(&json);
 
         assert_eq!(parser.convert("bhl"), "ভ্ল");
@@ -654,7 +656,7 @@ mod tests {
 
     #[test]
     fn test_sentence() {
-        let json = json::parse(include_str!("AvroPhonetic.json")).unwrap();
+        let json = serde_json::from_str(include_str!("AvroPhonetic.json")).unwrap();
         let parser = PhoneticParser::new(&json);
 
         assert_eq!(parser.convert("ami banglay gan gai"),  "আমি বাংলায় গান গাই");

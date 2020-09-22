@@ -1,4 +1,5 @@
-use crate::parser::PhoneticParser;
+use serde_json;
+use parser::PhoneticParser;
 
 /// Converts text into Bengali by using Avro Phonetic
 /// transliteration method.
@@ -9,7 +10,7 @@ pub struct AvroPhonetic {
 impl AvroPhonetic {
     /// Creates a new AvroPhonetic instance.
     pub fn new() -> AvroPhonetic {
-        let rule = json::parse(include_str!("AvroPhonetic.json")).unwrap();
+        let rule = serde_json::from_str(include_str!("AvroPhonetic.json")).unwrap();
         AvroPhonetic { parser: PhoneticParser::new(&rule) }
     }
 
@@ -17,6 +18,7 @@ impl AvroPhonetic {
     /// 
     /// # Example
     /// ```rust
+    /// # extern crate rupantor;
     /// # use rupantor::avro::AvroPhonetic;
     /// assert_eq!(AvroPhonetic::new().convert("rasT"), "রাস্ট");
     /// ```
@@ -27,7 +29,7 @@ impl AvroPhonetic {
 
 #[cfg(test)]
 mod tests {
-    use super::AvroPhonetic;
+    use avro::AvroPhonetic;
 
     #[test]
     fn test_avro() {
