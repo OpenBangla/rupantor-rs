@@ -14,7 +14,7 @@ by the user to create a phonetic method by specifying a custom grammar.
 Add this to your `Cargo.toml`:
 ```toml
 [dependencies]
-rupantor = "0.2"
+rupantor = "0.3"
 ```
 
 ## Example
